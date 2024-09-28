@@ -6,16 +6,16 @@ class PrimeTestCase(unittest.TestCase):
     def true_when_x_is_17(self):
 
         response = app.show_number(17)
-        self.assertEqual(response, {'is_prime': True})
+        self.assertEqual(response, 'True')
 
     def false_when_x_is_36(self):
         
         response = app.show_number(36)
-        self.assertEqual(response, {'is_prime': False})
+        self.assertEqual(response,'False')
     def true_when_x_is_13219(self):
         
         response = app.show_number(13219)
-        self.assertEqual(response, {'is_prime': True})
+        self.assertEqual(response,'True')
 
 
 if __name__ == '__main__':

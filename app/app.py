@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 
 app = Flask(__name__)
 
@@ -10,15 +10,15 @@ def index():
 def show_number(number):
     # แปลงค่าจาก string เป็น int
     number = int(number)
-    
+
     if number <= 1:
-        return jsonify(is_prime=False)
+        return 'False'
     
     for i in range(2, int(number**0.5) + 1):
         if number % i == 0:
-            return jsonify(is_prime=False)
+            return 'False'
     
-    return jsonify(is_prime=True)
+    return 'True'
 
 if __name__ == '__main__':
     app.run(debug=True)
