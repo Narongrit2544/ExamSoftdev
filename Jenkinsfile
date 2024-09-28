@@ -1,6 +1,6 @@
 pipeline {
     triggers {
-        pollSCM('H/1 * * * *') // Check every 5 minutes
+        pollSCM('H/5 * * * *') // Check every 5 minutes
     }
     agent { label 'vmtest' }
     environment {
@@ -12,10 +12,9 @@ pipeline {
             agent { label 'vmtest-test' }
             steps {
                 script {
-                    '''
                     def containers = sh(script: "docker ps -a -q --filter 'name=jenkinstestjob-web-1'", returnStdout: true).trim()
                     if (containers) {
-                        // บังคับหยุดและลบ container
+                        // Forcefully stop and remove the containers
                         containers.split().each { containerId ->
                             sh "docker kill ${containerId} || true"
                             sh "docker rm -f ${containerId} || true"
@@ -25,7 +24,6 @@ pipeline {
                         echo "No existing containers to remove."
                     }
                 }
-                '''
                 // Deploy using docker-compose
                 sh "docker-compose up -d --build"
             }
@@ -69,6 +67,5 @@ pipeline {
                 }
             }
         }
-        
     }
 }
