@@ -4,8 +4,8 @@ pipeline {
     }
     agent { label 'vmtest' }
     environment {
-        GITLAB_IMAGE_NAME = "registry.gitlab.com/threeman/boomtestjenkins"
-        VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/jenkinstestJob"
+        GITLAB_IMAGE_NAME = "registry.gitlab.com/threeman/examsoftdev"
+        VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/*******"
     }
     stages {
         stage('Deploy Docker Compose') {
@@ -41,12 +41,12 @@ pipeline {
 
                 rm -rf robot-aun
                 if [ ! -d "robot-aun" ]; then
-                    git clone https://github.com/SDPxMTNRWTPKKS/robot-aun.git
+                    git clone https://github.com/Narongrit2544/exam-robottest.git
                 fi
                 
                 pip install -r requirements.txt 
-                cd robot-aun
-                robot test-calculate.robot || true
+                cd exam-robottest
+                robot robot_test.robot || true
                 '''
             }
         }
@@ -67,37 +67,6 @@ pipeline {
                 }
             }
         }
-        stage("Pull from GitLab Registry") {
-            agent { label 'vmpreprod' }
-            steps {
-                withCredentials(
-                    [usernamePassword(
-                        credentialsId: 'gitlab-admin',
-                        passwordVariable: 'gitlabPassword',
-                        usernameVariable: 'gitlabUser'
-                    )]
-                ) {
-                    script {
-                        def containers = sh(script: "docker ps -q", returnStdout: true).trim()
-                        if (containers) {
-                            containers.split().each { containerId ->
-                                try {
-                                    sh "docker kill ${containerId}"
-                                    sh "docker rm -f ${containerId}"
-                                    echo "Container ${containerId} stopped and removed successfully."
-                                } catch (Exception e) {
-                                    echo "Failed to stop/remove container ${containerId}, but continuing: ${e.getMessage()}"
-                                }
-                            }
-                        } else {
-                            echo "No running containers to stop."
-                        }
-                    }
-                    sh "docker login registry.gitlab.com -u ${gitlabUser} -p ${gitlabPassword}"
-                    sh "docker pull ${GITLAB_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    sh "docker run -p 5000:5000 -d ${GITLAB_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                }
-            }
-        }
+        
     }
 }
