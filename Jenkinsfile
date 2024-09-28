@@ -22,6 +22,14 @@ pipeline {
                         echo "Port ${DOCKER_PORT} is free."
                     }
 
+                    // Check if any running container is using port 5000 and stop it
+                    def containerUsingPort = sh(script: "docker ps --filter 'publish=${DOCKER_PORT}' -q || true", returnStdout: true).trim()
+                    if (containerUsingPort) {
+                        echo "Docker container ${containerUsingPort} is using port ${DOCKER_PORT}, stopping it..."
+                        sh "docker stop ${containerUsingPort} || true"
+                        sh "docker rm ${containerUsingPort} || true"
+                    }
+
                     // Stop and remove existing containers with docker-compose down
                     sh "docker-compose down || true"
 
