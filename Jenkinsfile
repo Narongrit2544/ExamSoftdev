@@ -4,8 +4,8 @@ pipeline {
     }
     agent { label 'vmtest' }
     environment {
-        GITLAB_IMAGE_NAME = "registry.gitlab.com/threeman/boomtestjenkins"
-        VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/jenkinstestJob"
+        GITLAB_IMAGE_NAME = "registry.gitlab.com/threeman/examsoftdev"
+        VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/*******"
     }
     stages {
         stage('Deploy Docker Compose') {
@@ -41,12 +41,12 @@ pipeline {
 
                 rm -rf robot-aun
                 if [ ! -d "robot-aun" ]; then
-                    git clone https://github.com/SDPxMTNRWTPKKS/robot-aun.git
+                    git clone https://github.com/Narongrit2544/exam-robottest.git
                 fi
                 
                 pip install -r requirements.txt 
-                cd robot-aun
-                robot test-calculate.robot || true
+                cd exam-robottest
+                robot robot_test.robot || true
                 '''
             }
         }
