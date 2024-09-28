@@ -22,17 +22,8 @@ pipeline {
                         echo "Port ${DOCKER_PORT} is free."
                     }
 
-                    // Stop and remove existing containers
-                    def containers = sh(script: "docker ps -a -q --filter 'name=examsoftdev-web-1'", returnStdout: true).trim()
-                    if (containers) {
-                        containers.split().each { containerId ->
-                            sh "docker kill ${containerId} || true"
-                            sh "docker rm -f ${containerId} || true"
-                        }
-                        echo "Existing containers removed."
-                    } else {
-                        echo "No existing containers to remove."
-                    }
+                    // Stop and remove existing containers with docker-compose down
+                    sh "docker-compose down || true"
 
                     // Deploy using docker-compose
                     sh "docker-compose up -d --build"
