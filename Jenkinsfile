@@ -6,57 +6,71 @@ pipeline {
     environment {
         GITLAB_IMAGE_NAME = "registry.gitlab.com/threeman/examsoftdev"
         VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/ExamSoftdev"
+        DOCKER_PORT = "5000" // Specify the port to use
     }
     stages {
         stage('Deploy Docker Compose') {
             agent { label 'vmtest-test' }
             steps {
                 script {
-                    def containers = sh(script: "docker ps -a -q --filter 'name=examsoftdev-web-1'", returnStdout: true).trim()
-                
-                        if (containers) {
-                            containers.split().each { containerId ->
-                                sh "docker kill ${containerId} || true"
-                                sh "docker rm -f ${containerId} || true"
-                            }
-                            echo "Existing containers removed."
-                        } else {
-                            echo "No existing containers to remove."
-                        }
+                    // Check if any process is using port 5000 and kill it
+                    def usedPort = sh(script: "lsof -i :${DOCKER_PORT} -t || true", returnStdout: true).trim()
+                    if (usedPort) {
+                        echo "Port ${DOCKER_PORT} is in use by process ${usedPort}, killing it..."
+                        sh "kill -9 ${usedPort} || true"
+                    } else {
+                        echo "Port ${DOCKER_PORT} is free."
                     }
-                sh "docker-compose up -d --build"
 
+                    // Stop and remove existing containers
+                    def containers = sh(script: "docker ps -a -q --filter 'name=examsoftdev-web-1'", returnStdout: true).trim()
+                    if (containers) {
+                        containers.split().each { containerId ->
+                            sh "docker kill ${containerId} || true"
+                            sh "docker rm -f ${containerId} || true"
+                        }
+                        echo "Existing containers removed."
+                    } else {
+                        echo "No existing containers to remove."
+                    }
+
+                    // Deploy using docker-compose
+                    sh "docker-compose up -d --build"
+                }
             }
         }
-        stage("Run Tests") {
+
+        stage('Run Tests') {
             agent { label 'vmtest-test' }
             steps {
                 sh '''
                 . /home/vmtest/env/bin/activate
-              
-                rm -rf exam-robottest
-                if [ ! -d "exam-robottest" ]; then
-                    git clone https://github.com/Narongrit2544/exam-robottest.git
-                fi
                 
-                pip install -r requirements.txt 
-
+                # Clone and set up the test repository if not already cloned
+                rm -rf exam-robottest
+                git clone https://github.com/Narongrit2544/exam-robottest.git || true
+                
+                # Install dependencies
                 cd ${VMTEST_MAIN_WORKSPACE}
+                pip install -r requirements.txt
+                
+                # Run unit tests with coverage
                 python3 -m unittest unit_test.py -v
                 coverage run -m unittest unit_test.py -v
                 coverage report -m
-
-                pip install -r requirements.txt 
+                
+                # Run robot tests
                 cd exam-robottest
+                pip install -r requirements.txt
                 robot robot_test.robot || true
                 '''
             }
         }
-        stage("Delivery to GitLab Registry") {
+
+        stage('Delivery to GitLab Registry') {
             agent { label 'vmtest-test' }
             steps {
-                withCredentials(
-                    [usernamePassword(
+                withCredentials([usernamePassword(
                         credentialsId: 'gitlab-admin',
                         passwordVariable: 'gitlabPassword',
                         usernameVariable: 'gitlabUser'
