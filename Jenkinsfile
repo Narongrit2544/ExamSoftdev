@@ -11,8 +11,9 @@ pipeline {
         stage('Deploy Docker Compose') {
             agent { label 'vmtest-test' }
             steps {
+                '''
                 script {
-                    '''
+                    
                     def containers = sh(script: "docker ps -a -q --filter 'name=jenkinstestjob-web-1'", returnStdout: true).trim()
                     if (containers) {
                         // Forcefully stop and remove the containers
@@ -24,7 +25,9 @@ pipeline {
                     } else {
                         echo "No existing containers to remove."
                     }
-                }'''
+                
+                }
+                '''
                 // Deploy using docker-compose
                 sh "docker-compose up -d --build"
             }
