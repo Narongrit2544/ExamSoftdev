@@ -4,4 +4,3 @@ services:
       context: app
     ports:
       - "5000:5000"
-    image: registry.gitlab.com/threeman/examsoftdev:latest
