@@ -32,7 +32,8 @@ pipeline {
             agent { label 'vmtest-test' }
             steps {
                 sh '''
-                source /home/vmtest/env/bin/activate
+                . /home/vmtest/env/bin/activate
+              
                 rm -rf exam-robottest
                 if [ ! -d "exam-robottest" ]; then
                     git clone https://github.com/Narongrit2544/exam-robottest.git
