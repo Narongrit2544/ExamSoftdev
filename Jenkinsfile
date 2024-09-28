@@ -67,37 +67,6 @@ pipeline {
                 }
             }
         }
-        stage("Pull from GitLab Registry") {
-            agent { label 'vmpreprod' }
-            steps {
-                withCredentials(
-                    [usernamePassword(
-                        credentialsId: 'gitlab-admin',
-                        passwordVariable: 'gitlabPassword',
-                        usernameVariable: 'gitlabUser'
-                    )]
-                ) {
-                    script {
-                        def containers = sh(script: "docker ps -q", returnStdout: true).trim()
-                        if (containers) {
-                            containers.split().each { containerId ->
-                                try {
-                                    sh "docker kill ${containerId}"
-                                    sh "docker rm -f ${containerId}"
-                                    echo "Container ${containerId} stopped and removed successfully."
-                                } catch (Exception e) {
-                                    echo "Failed to stop/remove container ${containerId}, but continuing: ${e.getMessage()}"
-                                }
-                            }
-                        } else {
-                            echo "No running containers to stop."
-                        }
-                    }
-                    sh "docker login registry.gitlab.com -u ${gitlabUser} -p ${gitlabPassword}"
-                    sh "docker pull ${GITLAB_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    sh "docker run -p 5000:5000 -d ${GITLAB_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                }
-            }
-        }
+        
     }
 }
