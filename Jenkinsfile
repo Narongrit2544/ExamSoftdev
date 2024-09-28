@@ -32,18 +32,19 @@ pipeline {
             agent { label 'vmtest-test' }
             steps {
                 sh '''
-                . /home/vmtest/env/bin/activate
+                source /home/vmtest/env/bin/activate
+                rm -rf exam-robottest
+                if [ ! -d "exam-robottest" ]; then
+                    git clone https://github.com/Narongrit2544/exam-robottest.git
+                fi
                 
+                pip install -r requirements.txt 
+
                 cd ${VMTEST_MAIN_WORKSPACE}
                 python3 -m unittest unit_test.py -v
                 coverage run -m unittest unit_test.py -v
                 coverage report -m
 
-                rm -rf robot-aun
-                if [ ! -d "robot-aun" ]; then
-                    git clone https://github.com/Narongrit2544/exam-robottest.git
-                fi
-                
                 pip install -r requirements.txt 
                 cd exam-robottest
                 robot robot_test.robot || true
