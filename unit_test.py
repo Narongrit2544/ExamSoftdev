@@ -8,15 +8,19 @@ class PrimeTestCase(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-    def test_is_prime_true(self):
+    def true_when_x_is_17(self):
         # เรียกใช้ endpoint โดยใช้ test client
-        response = self.app.get('/is_prime/29')
+        response = self.app.get('/is_prime/17')
         self.assertEqual(response.json, {'is_prime': True})
 
-    def test_is_prime_false(self):
+    def false_when_x_is_36(self):
         # เรียกใช้ endpoint โดยใช้ test client
-        response = self.app.get('/is_prime/1')
+        response = self.app.get('/is_prime/36')
         self.assertEqual(response.json, {'is_prime': False})
+    def true_when_x_is_13219(self):
+        response = self.app.get('/is_prime/13219')
+        self.assertEqual(response.json, {'is_prime': True})
+
 
 if __name__ == '__main__':
     unittest.main()
