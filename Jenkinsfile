@@ -71,7 +71,6 @@ pipeline {
                         
                         # Run robot tests
                         cd exam-robottest
-                        pip install -r requirements.txt
                         robot robot_test.robot || true
                         '''
                     } catch (Exception e) {
