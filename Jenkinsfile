@@ -12,7 +12,7 @@ pipeline {
             agent { label 'vmtest-test' }
             steps {
                 script {
-                    def containers = sh(script: "sudo docker ps -a -q --filter 'name=examsoftdev-web-1'", returnStdout: true).trim()
+                    def containers = sh(script: "docker ps -a -q --filter 'name=examsoftdev-web-1'", returnStdout: true).trim()
                 
                         if (containers) {
                             containers.split().each { containerId ->
