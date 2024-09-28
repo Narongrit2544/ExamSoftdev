@@ -16,15 +16,15 @@ pipeline {
                 
                         if (containers) {
                             containers.split().each { containerId ->
-                                sh "sudo docker kill ${containerId} || true"
-                                sh "sudo docker rm -f ${containerId} || true"
+                                sh "docker kill ${containerId} || true"
+                                sh "docker rm -f ${containerId} || true"
                             }
                             echo "Existing containers removed."
                         } else {
                             echo "No existing containers to remove."
                         }
                     }
-                sh "sudo docker-compose up -d --build"
+                sh "docker-compose up -d --build"
 
             }
         }
