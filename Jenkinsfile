@@ -12,23 +12,7 @@ pipeline {
         stage('Deploy Docker Compose') {
             agent { label 'vmtest-test' }
             steps {
-                script {
-                    echo "Checking if any Docker containers are running..."
-                    def runningContainers = sh(
-                        script: "docker ps -q",
-                        returnStdout: true
-                    ).trim()
-
-                    if (runningContainers) {
-                        echo "Stopping running containers..."
-                        // Escape $ symbol with double $$ or use Groovy expression
-                        sh "docker stop \$(docker ps -q)"
-                        sh "docker compose down"
-                    } else {
-                        echo "No running containers to stop."
-                    }
-                    
-                    echo "Building and starting Docker Compose..."
+                
                     sh "docker compose up -d --build"
                 }
             }
