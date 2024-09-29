@@ -12,6 +12,7 @@ pipeline {
         stage('Deploy Docker Compose') {
             agent { label 'vmtest-test' }
             steps {
+                sh"docker compose down"
                 sh "docker compose up -d --build"
             }
         }
