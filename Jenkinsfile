@@ -21,7 +21,8 @@ pipeline {
 
                     if (runningContainers) {
                         echo "Stopping running containers..."
-                        sh "docker stop $(docker ps -q)"
+                        // Escape $ symbol with double $$ or use Groovy expression
+                        sh "docker stop \$(docker ps -q)"
                         sh "docker compose down"
                     } else {
                         echo "No running containers to stop."
