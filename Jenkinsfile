@@ -10,14 +10,14 @@ pipeline {
     }
     stages {
         stage('Deploy Docker Compose') {
-            agent { label 'vmtest-test' }
+            agent { label 'connect-vmtest' }
             steps {
                 sh "docker compose up -d --build"
             }
         }
 
         stage('Run Tests') {
-            agent { label 'vmtest-test' }
+            agent { label 'connect-vmtest' }
             steps {
                 script {
                     try {
@@ -51,7 +51,7 @@ pipeline {
         }
 
         stage('Delivery to GitLab Registry') {
-            agent { label 'vmtest-test' }
+            agent { label 'connect-vmtest' }
             steps {
                 script {
                     try {
