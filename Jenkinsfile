@@ -5,7 +5,7 @@ pipeline {
     agent { label 'vmtest' }
     environment {
         GITLAB_IMAGE_NAME = "registry.gitlab.com/threeman/examsoftdev"
-        VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/ExamSoftdev"
+        VMTEST_MAIN_WORKSPACE = "/home/vmtest/workspace/test"
         DOCKER_PORT = "5000" // Specify the port to use
     }
     stages {
